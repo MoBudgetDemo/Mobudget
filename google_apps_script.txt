@@ -1,0 +1,36 @@
+// Google Apps Script for MoBudget prototype database
+// 1. Create a Google Sheet named MoBudget Prototype Data.
+// 2. Add sheets/tabs: Sessions, BudgetInputs, RateSnapshot, ActivityLog.
+// 3. Extensions > Apps Script > paste this code.
+// 4. Deploy > New deployment > Web app.
+// 5. Execute as: Me. Who has access: Anyone with the link.
+// 6. Copy the Web App URL into MoBudget Settings.
+
+function doPost(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var data = JSON.parse(e.postData.contents || '{}');
+  var sessionId = Utilities.getUuid();
+  var ts = new Date();
+
+  appendRow_(ss, 'Sessions', ['SessionID','Timestamp','Mode','ParticipantInfo','TestOnly'], [sessionId, ts, data.sessionMode || '', data.participantInfo || '', data.testOnly || false]);
+
+  if (data.budget) {
+    appendRow_(ss, 'BudgetInputs', ['SessionID','Timestamp','Income','Expenses','DisposableIncome','SavingsRate'], [sessionId, ts, data.budget.income, data.budget.expenses, data.budget.disposable, data.budget.rate]);
+  }
+
+  (data.bankRates || []).forEach(function(r) {
+    appendRow_(ss, 'RateSnapshot', ['SessionID','Timestamp','Bank','Product','Category','DisplayRate','NumericRate','SourceURL','DateCollected','Notes'], [sessionId, ts, r.bankName, r.productName, r.category, r.displayRate, r.rate, r.sourceURL, r.dateCollected, r.notes]);
+  });
+
+  (data.activityLog || []).forEach(function(action) {
+    appendRow_(ss, 'ActivityLog', ['SessionID','Timestamp','Action'], [sessionId, ts, action]);
+  });
+
+  return ContentService.createTextOutput(JSON.stringify({status:'ok', sessionId: sessionId})).setMimeType(ContentService.MimeType.JSON);
+}
+
+function appendRow_(ss, sheetName, headers, row) {
+  var sheet = ss.getSheetByName(sheetName) || ss.insertSheet(sheetName);
+  if (sheet.getLastRow() === 0) sheet.appendRow(headers);
+  sheet.appendRow(row);
+}

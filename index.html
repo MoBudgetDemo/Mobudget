@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoBudget Prototype</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div id="modal" class="modal hidden">
+        <div class="modal-card">
+            <h3 id="modalTitle">Confirm</h3>
+            <p id="modalMsg"></p>
+            <div class="modal-actions">
+                <button id="modalCancel" class="secondary">Cancel</button>
+                <button id="modalOk" class="primary">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-card">
+            <div class="auth-brand">
+                <div class="mark big">Mo</div>
+                <div>
+                    <h1>MoBudget</h1>
+                    <p>My Budget, My Bank Rates</p>
+                </div>
+            </div>
+            <div id="authSplash" class="auth-step active-auth">
+                <h2>Secure educational prototype</h2>
+                <p>Track budgets, compare online bank-rate examples and estimate indicative loan scenarios.</p>
+                <button class="primary full" id="toPin">Continue</button>
+            </div>
+            <div id="authPin" class="auth-step">
+                <h2>Prototype password</h2>
+                <p class="muted">Password must be 8 characters and include uppercase, lowercase, a number and a special character.</p>
+                <input id="pinInput" class="auth-input" type="password" maxlength="8" placeholder="Enter password" />
+                <p id="pinError" class="error"></p>
+                <button class="primary full" id="unlockBtn">Unlock</button>
+                <button class="biometric-btn full" id="bioBtn">Use biometric login (mobile demo)</button>
+                <button class="link-btn" id="forgotBtn">Forgot password?</button>
+            </div>
+            <div id="authForgot" class="auth-step">
+                <h2>Reset password</h2>
+                <p class="muted">Enter your email address. If this were a live application, a password reset link would be sent to your inbox.</p>
+                <input id="resetEmail" class="auth-input" type="email" placeholder="Email address" />
+                <p id="resetMsg" class="success-msg"></p>
+                <button class="primary full" id="sendResetBtn" type="button">Send reset email</button>
+                <button class="link-btn" id="backToLoginBtn" type="button">Back to login</button>
+            </div>
+            <div id="authConsent" class="auth-step">
+                <h2>Consent and disclaimer</h2>
+                <p>MoBudget is an academic prototype. It does not provide financial advice, request bank credentials, connect to bank accounts or process payments.</p>
+                <label class="check">
+                    <input type="checkbox" id="consentCheck"> I understand and agree to continue.</label>
+                <button class="primary full" id="toMode" disabled>Continue</button>
+            </div>
+            <div id="authMode" class="auth-step">
+                <h2>Choose mode</h2>
+                <div class="mode-grid">
+                    <button class="mode-card" id="demoMode"><strong>Demo Mode</strong><span>Use sample data</span></button>
+                    <button class="mode-card" id="participantMode"><strong>Participant Mode</strong><span>Anonymous participant session</span></button>
+                </div>
+                <div id="participantBox" class="participant-box hidden">
+                    <input id="participantId" class="auth-input" placeholder="Participant ID e.g. P001">
+                    <select id="ageGroup" class="auth-input">
+                        <option>18–21</option>
+                        <option>22–25</option>
+                        <option>26–30</option>
+                    </select>
+                    <button class="primary full" id="startParticipant">Start session</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app locked" id="appShell">
+        <aside class="rail">
+            <div class="brand">
+                <div class="mark">Mo</div>
+                <div>
+                    <h1>MoBudget</h1>
+                    <p>My Budget, My Bank Rates</p>
+                </div>
+            </div>
+            <button class="nav active" data-page="dashboard">Dashboard</button>
+            <button class="nav" data-page="budget">Budget</button>
+            <button class="nav" data-page="rates">Rates</button>
+            <button class="nav" data-page="compare">Compare</button>
+            <button class="nav" data-page="loan">Loan</button>
+            <button class="nav" data-page="sources">Sources</button>
+            <button class="nav" data-page="reports">Reports</button>
+            <button class="nav" data-page="settings" hidden>Settings</button>
+            <button class="nav" data-page="admin" hidden >Admin</button>
+            <button class="nav" data-page="about">About</button>
+            <!-- <button class="lock-btn" id="lockBtn">Lock App</button> -->
+            <button class="lock-btn" id="lockBtn" hidden>Lock App</button>
+            <div class="rail-card"><strong>Prototype mode</strong><span>No real bank login. Data stays in browser unless exported.</span></div>
+        </aside>
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">FinTech dissertation prototype </p>
+                    <h2 id="pageTitle">Dashboard</h2></div>
+                <div class="status-chip"><span id="sessionModeLabel">Demo</span> • <span id="sessionTimeTop"></span></div>
+            </header>
+
+            <section id="dashboard" class="page active-page">
+                <div class="hero">
+                    <div><span class="pill">MoBudget overview</span>
+                        <h3>Start with your budget, then compare smarter.</h3>
+                        <p>Quick actions, privacy-friendly dashboard, source-tracked rates and exportable session records.</p>
+                        <div class="hero-actions">
+                            <button data-page="budget" class="primary jump">Track budget</button>
+                            <button data-page="rates" class="secondary jump">View rates</button>
+                        </div>
+                    </div>
+                    <div class="mini-summary-card"><span>Access status</span><strong>Unlocked</strong>
+                        <p id="miniSessionText">Demo session active.</p>
+                    </div>
+                </div>
+                <div class="metrics">
+                    <article><span>Income</span><strong id="mIncome">MUR 30,000</strong></article>
+                    <article><span>Expenses</span><strong id="mExpenses">MUR 22,000</strong></article>
+                    <article class="privacy-card"><span>Estimated savings</span><strong>Hidden</strong>
+                        <button data-page="budget" class="text-link jump">View in Budget</button>
+                    </article>
+                    <article><span>Savings rate</span><strong id="mRate">26.7%</strong></article>
+                </div>
+                <div class="quick-actions">
+                    <article class="action-card"><span>1</span>
+                        <h4>Track budget</h4>
+                        <p>Update income and expenses.</p>
+                        <button data-page="budget" class="text-link jump">Open</button>
+                    </article>
+                    <article class="action-card"><span>2</span>
+                        <h4>Compare rates</h4>
+                        <p>Check online-source rates.</p>
+                        <button data-page="rates" class="text-link jump">Open</button>
+                    </article>
+                    <article class="action-card"><span>3</span>
+                        <h4>Estimate loan</h4>
+                        <p>Advertised vs scenario.</p>
+                        <button data-page="loan" class="text-link jump">Open</button>
+                    </article>
+                </div>
+                <div class="grid2">
+                    <section class="card">
+                        <h3>Expense overview</h3>
+                        <canvas id="expenseChart" height="180"></canvas>
+                    </section>
+                    <section class="card">
+                        <h3>Activity log</h3>
+                        <div id="activityLog" class="activity-log"></div>
+                    </section>
+                </div>
+            </section>
+
+            <section id="budget" class="page">
+                <div class="grid2">
+                    <form id="budgetForm" class="card form">
+                        <h3>Budget inputs</h3>
+                        <p class="note wide">Inputs are locked. Click Edit Budget before changing values.</p>
+                        <label>Main monthly income
+                            <input class="budget-field" id="income" type="number" value="30000" disabled>
+                        </label>
+                        <label>Other income
+                            <input class="budget-field" id="otherIncome" type="number" value="0" disabled>
+                        </label>
+                        <label>House loan / mortgage
+                            <input class="exp budget-field" id="mortgage" type="number" value="9000" disabled>
+                        </label>
+                        <label>Leasing
+                            <input class="exp budget-field" id="leasing" type="number" value="0" disabled>
+                        </label>
+                        <label>Car loan
+                            <input class="exp budget-field" id="carLoan" type="number" value="0" disabled>
+                        </label>
+                        <label>Food and groceries
+                            <input class="exp budget-field" id="food" type="number" value="5500" disabled>
+                        </label>
+                        <label>Transport
+                            <input class="exp budget-field" id="transport" type="number" value="2500" disabled>
+                        </label>
+                        <label>Education
+                            <input class="exp budget-field" id="education" type="number" value="1500" disabled>
+                        </label>
+                        <label>Mobile / internet
+                            <input class="exp budget-field" id="mobile" type="number" value="1200" disabled>
+                        </label>
+                        <label>Personal expenses
+                            <input class="exp budget-field" id="personal" type="number" value="1800" disabled>
+                        </label>
+                        <label>Other expenses
+                            <input class="exp budget-field" id="otherExp" type="number" value="500" disabled>
+                        </label>
+                        <button class="secondary" id="editBudgetBtn" type="button">Edit Budget</button>
+                        <button class="primary" type="submit">Save & Calculate</button>
+                    </form>
+                    <section class="card result">
+                        <h3>Budget result</h3>
+                        <div><span>Total expenses</span><strong id="rExpenses">MUR 22,000</strong></div>
+                        <div><span>Disposable income</span><strong id="rDisposable">MUR 8,000</strong></div>
+                        <div><span>Savings rate</span><strong id="rRate">26.7%</strong></div>
+                        <p id="budgetAlert" class="warning hidden"></p>
+                        <button class="secondary" id="saveLocalBtn">Save locally</button>
+                        <button class="secondary" id="resetBudgetBtn">Reset demo data</button>
+                    </section>
+                </div>
+            </section>
+
+            <section id="rates" class="page">
+                <div class="section-head">
+                    <div>
+                        <h3>Bank rates shown for this session</h3>
+                        <p>Grouped by category. Each card includes source and timestamp.</p>
+                        <p class="snapshot-line">Snapshot: <strong id="sessionTimeRates"></strong></p>
+                    </div>
+                </div>
+                <div class="category-tabs">
+                    <button class="tab-btn active" data-category="All">All</button>
+                    <button class="tab-btn" data-category="Benchmark">Benchmark</button>
+                    <button class="tab-btn" data-category="Loan">Loans</button>
+                    <button class="tab-btn" data-category="Fixed Deposit">Fixed Deposits</button>
+                </div>
+                <div id="rateSections" class="rate-sections"></div>
+            </section>
+
+            <section id="compare" class="page">
+                <div class="grid2">
+                    <form id="compareForm" class="card form">
+                        <h3>Compare products</h3>
+                        <p class="note wide"> Product cards should appear below. </p>
+                        <p class="note wide">Default example compares Absa Personal Loan and SBM Personal Loan.</p>
+                        <label>Amount / principal
+                            <input id="cmpAmount" type="number" value="100000">
+                        </label>
+                        <label>Period in months
+                            <input id="cmpMonths" type="number" value="48"><small class="field-hint">For savings: holding period. For loans: repayment term.</small></label>
+                        <div class="product-picker-block wide">
+                            <label>First product</label>
+                            <div id="pickerA" class="product-picker"></div>
+                            <span id="selectedA" class="selected-product">Loading product...</span>
+                        </div>
+                        <div class="product-picker-block wide">
+                            <label>Second product</label>
+                            <div id="pickerB" class="product-picker"></div>
+                            <span id="selectedB" class="selected-product">Loading product...</span>
+                        </div>
+                        <button class="primary" type="submit">Compare rates</button>
+                    </form>
+                    <section class="card result">
+                        <h3>Comparison result</h3>
+                        <canvas id="compareChart" height="160"></canvas>
+                        <div><span id="labelA">Option A</span><strong id="outA">-</strong></div>
+                        <div><span id="labelB">Option B</span><strong id="outB">-</strong></div>
+                        <div class="success"><span>Difference</span><strong id="outDiff">-</strong></div>
+                        <p id="compareNote" class="note"></p>
+                    </section>
+                </div>
+            </section>
+
+            <section id="loan" class="page">
+                <div class="grid2">
+                    <form id="loanForm" class="card form">
+                        <h3>Loan scenario calculator</h3>
+                        <label>Loan amount
+                            <input id="loanAmount" type="number" value="100000">
+                        </label>
+                        <label>Advertised online rate (%)
+                            <input id="loanRate" type="number" step="0.01" value="9.50">
+                        </label>
+                        <label>Select bank rate
+                            <select id="loanBankRate"></select><span id="selectedLoanRate" class="selected-product">Selected bank rate appears here</span></label>
+                        <label>Monthly salary
+                            <input id="salary" type="number" value="65000">
+                        </label>
+                        <label>Term in months
+                            <input id="term" type="number" value="24">
+                        </label>
+                        <button class="primary" type="submit">Calculate scenarios</button>
+                    </form>
+                    <section class="card result">
+                        <h3>Advertised vs scenario</h3>
+                        <canvas id="loanChart" height="160"></canvas>
+                        <div><span>Advertised rate</span><strong id="advRate">9.50%</strong></div>
+                        <div><span>Scenario rate</span><strong id="scnRate">9.03%</strong></div>
+                        <div><span>Advertised monthly repayment</span><strong id="advPay">-</strong></div>
+                        <div><span>Scenario monthly repayment</span><strong id="scnPay">-</strong></div>
+                        <div class="success"><span>Monthly difference</span><strong id="payDiff">-</strong></div>
+                        <p class="warning">Scenario is illustrative only. Actual bank rates may differ after assessment.</p>
+                    </section>
+                </div>
+                <section class="card">
+                    <h3>Available loan-rate examples</h3>
+                    <p class="note">Select one of these rates above or enter a rate manually. All rates are indicative and source-linked.</p>
+                    <div id="loanRateCards" class="loan-rate-list"></div>
+                </section>
+                <section class="card">
+                    <h3>Scenario logic</h3>
+                    <div class="logic-row"><span>Below MUR 50,000</span><strong>Advertised rate</strong></div>
+                    <div class="logic-row"><span>MUR 50,000–59,999</span><strong>Advertised × 0.975</strong></div>
+                    <div class="logic-row"><span>MUR 60,000+</span><strong>Advertised × 0.95</strong></div>
+                </section>
+            </section>
+
+            <section id="sources" class="page">
+                <div class="card">
+                    <h3>Source and provenance register</h3>
+                    <p class="note">Export a session snapshot for evaluation records.</p>
+                    <button id="exportSessionBtn" class="primary">Export session snapshot</button>
+                    <button id="reportBtn" class="secondary">Generate summary report</button>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Bank/source</th>
+                                    <th>Product</th>
+                                    <th>Rate</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Source</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sourceRows"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+
+            <section id="reports" class="page">
+                <div class="section-head">
+                    <div>
+                        <h3>Reports / Export Centre</h3>
+                        <p>Preview the information that can be exported or saved to a database. This helps examiners see what the prototype records during evaluation.</p>
+                    </div>
+                </div>
+                <div class="report-actions">
+                    <button id="refreshReportsBtn" class="secondary">Refresh preview</button>
+                    <button id="downloadAllCsvBtn" class="primary">Download full CSV</button>
+                    <button id="downloadReportTxtBtn" class="secondary">Download TXT report</button>
+                    <button id="copyReportBtn" class="secondary">Copy summary</button>
+                    <button id="saveDatabaseBtn" class="primary">Save to database</button>
+                </div>
+                <div class="grid2">
+                    <section class="card">
+                        <h3>Budget Summary Preview</h3><pre id="budgetReportPreview" class="report-box"></pre></section>
+                    <section class="card">
+                        <h3>Database Status</h3>
+                        <p id="dbStatus" class="warning">No database endpoint configured yet. Add a Google Apps Script URL in Settings.</p>
+                        <p class="note">For dissertation testing, store only anonymous participant/session data.</p>
+                    </section>
+                </div>
+                <section class="card">
+                    <h3>Rate Snapshot Preview</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Bank</th>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Rate shown</th>
+                                    <th>Source</th>
+                                    <th>Session time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportRateRows"></tbody>
+                        </table>
+                    </div>
+                </section>
+                <section class="card">
+                    <h3>Activity Log Preview</h3>
+                    <div id="reportLogPreview" class="activity-log large"></div>
+                </section>
+            </section>
+
+
+
+            <section id="reports" class="page">
+                <div class="section-head">
+                    <div>
+                        <h3>Reports / Export Centre</h3>
+                        <p>Preview the information that can be exported or saved to a database. This helps examiners see what the prototype records during evaluation.</p>
+                    </div>
+                </div>
+                <div class="report-actions">
+                    <button id="refreshReportsBtn" class="secondary">Refresh preview</button>
+                    <button id="downloadAllCsvBtn" class="primary">Download full CSV</button>
+                    <button id="downloadReportTxtBtn" class="secondary">Download TXT report</button>
+                    <button id="copyReportBtn" class="secondary">Copy summary</button>
+                    <button id="saveDatabaseBtn" class="primary">Save to database</button>
+                </div>
+                <div class="grid2">
+                    <section class="card">
+                        <h3>Budget Summary Preview</h3><pre id="budgetReportPreview" class="report-box"></pre></section>
+                    <section class="card">
+                        <h3>Database Status</h3>
+                        <p id="dbStatus" class="warning">No database endpoint configured yet. Add a Google Apps Script URL in Settings.</p>
+                        <p class="note">For dissertation testing, store only anonymous participant/session data.</p>
+                    </section>
+                </div>
+                <section class="card">
+                    <h3>Rate Snapshot Preview</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Bank</th>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Rate shown</th>
+                                    <th>Source</th>
+                                    <th>Session time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportRateRows"></tbody>
+                        </table>
+                    </div>
+                </section>
+                <section class="card">
+                    <h3>Activity Log Preview</h3>
+                    <div id="reportLogPreview" class="activity-log large"></div>
+                </section>
+            </section>
+
+            <section id="settings" class="page">
+                <div class="grid2">
+                    <section class="card">
+                        <h3>Profile / Settings</h3>
+                        <div class="result">
+                            <div><span>Session mode</span><strong id="setMode">Demo</strong></div>
+                            <div><span>Currency</span><strong>MUR</strong></div>
+                            <div><span>Privacy mode</span><strong>On</strong></div>
+                        </div>
+                        <label class="settings-field">Google Sheets Web App URL
+                            <input id="dbEndpoint" placeholder="Paste Apps Script web app URL here">
+                        </label>
+                        <button id="saveEndpointBtn" class="secondary">Save database endpoint</button>
+                        <button id="testDatabaseBtn" class="secondary">Test database connection</button>
+                        <label class="settings-field">Google Sheets Web App URL
+                            <input id="dbEndpoint" placeholder="Paste Apps Script web app URL here">
+                        </label>
+                        <button id="saveEndpointBtn" class="secondary">Save database endpoint</button>
+                        <button id="testDatabaseBtn" class="secondary">Test database connection</button>
+                        <button id="changePinBtn" class="secondary">Change prototype password</button>
+                        <button id="resetAllBtn" class="secondary">Reset all local data</button>
+                    </section>
+                    <section class="card">
+                        <h3>Saved data</h3>
+                        <p class="note">Budget inputs are stored only in this browser if you click Save locally.</p>
+                        <button id="loadLocalBtn" class="primary">Load saved budget</button>
+                    </section>
+                </div>
+            </section>
+
+            <section id="admin" class="page">
+                <div class="grid2">
+                    <form id="adminRateForm" class="card form">
+                        <h3>Admin: Add rate entry</h3>
+                        <label>Bank
+                            <input id="adminBank">
+                        </label>
+                        <label>Product
+                            <input id="adminProduct">
+                        </label>
+                        <label>Category
+                            <select id="adminCategory">
+                                <option>Loan</option>
+                                <option>Fixed Deposit</option>
+                                <option>Savings</option>
+                                <option>Benchmark</option>
+                            </select>
+                        </label>
+                        <label>Numeric rate, if available
+                            <input id="adminRate" type="number" step="0.01">
+                        </label>
+                        <label>Display rate
+                            <input id="adminDisplay" placeholder="e.g. From 7.25% p.a.">
+                        </label>
+                        <label>Source URL
+                            <input id="adminSource">
+                        </label>
+                        <button class="primary" type="submit">Add rate to session</button>
+                    </form>
+                    <section class="card">
+                        <h3>Admin note</h3>
+                        <p>Added rates are stored for this session and can be exported. Use official online webpages only.</p>
+                    </section>
+                </div>
+            </section>
+
+            <section id="about" class="page">
+                <div class="card">
+                    <h3>About and disclaimer</h3>
+                    <p><strong>Version:</strong> Compare dropdown and loan-rate selector included.</p>
+                    <p><strong>MoBudget is an academic prototype.</strong> It does not provide financial advice, connect to bank accounts, or process payments.</p>
+                    <p>The password and biometric options are simulated security features for prototype realism only.</p>
+                    <p>Users must verify rates directly with the relevant bank before making decisions.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+    <nav class="mobile-nav">
+        <button data-page="dashboard">Home</button>
+        <button data-page="budget">Budget</button>
+        <button data-page="rates">Rates</button>
+        <button data-page="loan">Loan</button>
+        <button data-page="settings">More</button>
+    </nav>
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
